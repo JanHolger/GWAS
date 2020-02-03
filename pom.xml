@@ -73,7 +73,9 @@
                     <execution>
                         <goals>
                             <goal>addSources</goal>
+                            <goal>generateStubs</goal>
                             <goal>compile</goal>
+                            <goal>removeStubs</goal>
                         </goals>
                     </execution>
                 </executions>

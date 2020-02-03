@@ -21,8 +21,10 @@ class ORMDatabase {
             settings['host'] = 'localhost'
         }
         if(!settings.containsKey('user')){
-            settings['user'] = settings['username']
-            settings['username'] = ''
+            if(settings.containsKey('username')){
+                settings['user'] = settings['username']
+                settings['username'] = ''
+            }
         }
         if(!settings.containsKey('user')){
             settings['user'] = settings['database']

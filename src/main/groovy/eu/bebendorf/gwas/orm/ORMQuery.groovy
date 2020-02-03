@@ -61,6 +61,9 @@ class ORMQuery {
         if(name == "all"){
             return all()
         }
+        if(name == "one"){
+            return one()
+        }
         return null
     }
 }

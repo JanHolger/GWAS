@@ -10,6 +10,7 @@ class Exchange {
     final HttpMethod method
     final String path
     Map<String, Object> pathVariables
+    Map<String, String> parameters = [:]
     private HttpServletRequest request
     private HttpServletResponse response
     Exchange(String path, HttpServletRequest request, HttpServletResponse response){
@@ -39,5 +40,15 @@ class Exchange {
     }
     String header(String header){
         request.getHeader(header)
+    }
+    void redirect(String url){
+        response.setStatus(302)
+        response.sendRedirect(url)
+    }
+    HttpServletRequest rawRequest(){
+        request
+    }
+    HttpServletResponse rawResponse(){
+        response
     }
 }

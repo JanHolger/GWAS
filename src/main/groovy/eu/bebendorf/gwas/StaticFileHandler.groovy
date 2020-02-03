@@ -17,6 +17,8 @@ class StaticFileHandler {
         File file = new File(rootDirectory, exchange.getPath())
         if(!file.exists())
             return false
+        if(file.isDirectory())
+            return false
         MimeType mimeType = MimeType.byFileName(file.getName())
         exchange.header("content-type", mimeType.mime)
         FileInputStream fis = new FileInputStream(file)

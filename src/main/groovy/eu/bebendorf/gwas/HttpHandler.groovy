@@ -13,6 +13,10 @@ class HttpHandler extends AbstractHandler {
         this.httpManager = httpManager
     }
     void handle(String path, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
-        httpManager.execute(new Exchange(path, httpServletRequest, httpServletResponse))
+        Exchange exchange = new Exchange(path, httpServletRequest, httpServletResponse)
+        for(key in httpServletRequest.getParameterNames()){
+            exchange.parameters[key] = httpServletRequest.getParameter(key)
+        }
+        httpManager.execute(exchange)
     }
 }

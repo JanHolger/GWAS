@@ -1,5 +1,6 @@
 package eu.bebendorf.gwas
 
+import eu.bebendorf.gwas.helper.BCrypt
 import eu.bebendorf.gwas.helper.HttpMethod
 import eu.bebendorf.gwas.orm.ORMDatabase
 import eu.bebendorf.gwas.router.DefaultRouteParamTransformer
@@ -66,15 +67,6 @@ class HttpManager implements RouteParamTransformerProvider {
                 Closure route = { HttpMethod method, String path, Closure closure -> routes.put(new Route(this, method, path), closure) }
                 binding['route'] = route
                 HttpMethod.values().each { binding[it.name().toLowerCase(Locale.ENGLISH)] = { String path, Closure closure -> route(it, path, closure) } }
-                binding['view'] = { String name, Map model = [:] ->
-                    model['view'] = binding['view']
-                    Template template = templateProvider.get(name)
-                    if(template != null){
-                        return template.make(model)
-                    }
-                    null
-                }
-                binding['db'] = databases
                 scriptEngine.run(file.getName(), binding)
                 controllers.put(file, routes)
                 lastModified.put(file, file.lastModified())
@@ -98,7 +90,23 @@ class HttpManager implements RouteParamTransformerProvider {
                 Map<String, Object> res = route.match(exchange.method, exchange.path)
                 if(res != null){
                     exchange.pathVariables = res
+                    map[route].setProperty('PATH', res)
+                    map[route].setProperty('PARAMS', exchange.parameters)
                     map[route].setProperty('exchange', exchange)
+                    map[route].setProperty('redirect', exchange.&redirect)
+                    Closure view
+                    view = { String name, Map model = [:] ->
+                        model['view'] = view
+                        Template template = templateProvider.get(name)
+                        if(template != null){
+                            return template.make(model)
+                        }
+                        null
+                    }
+                    map[route].setProperty('view', view)
+                    map[route].setProperty('db', databases)
+                    map[route].setProperty('hashpw', BCrypt.&hashpw)
+                    map[route].setProperty('checkpw', BCrypt.&checkpw)
                     String result = map[route]()
                     if(result != null){
                         exchange.header('content-type', 'text/html')
